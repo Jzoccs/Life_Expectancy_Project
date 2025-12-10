@@ -1,0 +1,22 @@
+project:
+  type: website
+
+website:
+  title: "Life Expectancy Analysis"
+  navbar:
+    left:
+      - href: index.qmd
+        text: "Home"
+      - href: methodology.qmd
+        text: "Methodology"
+      - href: analysis.qmd
+        text: "Analysis"
+      - href: visualizations.qmd
+        text: "Visualizations"
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-location: left
+    code-fold: true

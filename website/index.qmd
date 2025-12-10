@@ -1,0 +1,15 @@
+---
+title: "Life Expectancy Project"
+---
+
+# Overview
+
+Welcome to my Life Expectancy Analysis Project.
+
+This website summarizes:
+
+- the dataset and variables
+- methodology and modeling
+- exploratory analysis
+- machine learning results
+- interactive visualizations

@@ -1,0 +1,13 @@
+---
+title: "Methodology"
+---
+
+# Methodology
+
+Describe:
+
+- Dataset sources (from /data/raw and /data/processed)
+- Preprocessing pipeline (src/ scripts)
+- Feature engineering
+- Model selection
+- Train/test split
