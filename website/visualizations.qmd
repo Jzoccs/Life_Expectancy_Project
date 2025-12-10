@@ -1,0 +1,229 @@
+---
+title: "Visualizations"
+format: html
+jupyter: python3
+execute:
+    echo: false     # hide all code
+---
+
+
+## GDP vs Life Expectancy (Animated) 
+
+This visualization shows the relationship between GDP per capita and life expectancy over time, with bubble sizes representing CO₂ emissions per capita and continents separated into facets.
+
+```{python}
+import plotly.express as px
+import pandas as pd
+
+df = pd.read_csv("../data/processed/merged_dataset_with_continents.csv")
+df = df.sort_values("year")
+
+continent_order = ["Africa", "Asia", "Europe", "North America", "South America", "Oceania"]
+df["continent"] = pd.Categorical(df["continent"], categories=continent_order, ordered=True)
+
+fig = px.scatter(
+    df,
+    x="gdp_per_capita",
+    y="life_expectancy",
+    animation_frame="year",
+    animation_group="country_name",
+    size="co2_per_capita",
+    color="continent",
+    facet_col="continent",
+    facet_col_wrap=3,
+    hover_name="country_name",
+    hover_data={
+        "continent": False,
+        "gdp_per_capita": True,
+        "life_expectancy": True,
+        "co2_per_capita": True
+    },
+    log_x=True,
+    size_max=45,
+    range_x=[100, 100000],
+    range_y=[25, 90],
+    opacity=0.8,
+    title="GDP vs Life Expectancy (Bubble Size = CO₂ Emissions)"
+)
+
+fig.update_layout(
+    plot_bgcolor="white",
+    paper_bgcolor="white",
+    title_x=0.5,
+    legend_title_text="Continent",
+    margin=dict(t=100, l=40, r=40, b=40)
+)
+
+fig.update_xaxes(showgrid=True, gridcolor="lightgray")
+fig.update_yaxes(showgrid=True, gridcolor="lightgray")
+
+for a in fig.layout.annotations:
+    a.text = a.text.replace("continent=", "")
+
+fig
+```
+
+## Life Expectancy, CO2 Emissions per capita, and GDP per capita trends over time
+
+This shows the trends of Life Expectancy, CO2 Emisions Per Capita, and GDP Per Capita over our dataset's years
+
+```{python}
+import pandas as pd
+import plotly.graph_objects as go
+
+# Load data
+df = pd.read_csv("../data/processed/merged_dataset_with_continents.csv")
+
+# Compute medians by year
+yearly = df.groupby("year").agg(
+    median_life=("life_expectancy", "median"),
+    median_gdp=("gdp_per_capita", "median"),
+    median_co2=("co2_per_capita", "median")
+).reset_index()
+
+# Create figure
+fig = go.Figure()
+
+# Life Expectancy (Left axis)
+fig.add_trace(go.Scatter(
+    x=yearly["year"],
+    y=yearly["median_life"],
+    mode="lines",
+    name="Life Expectancy (Median)",
+    line=dict(width=3, color="#1f77b4"),
+    yaxis="y"
+))
+
+# GDP (Right axis 1)
+fig.add_trace(go.Scatter(
+    x=yearly["year"],
+    y=yearly["median_gdp"],
+    mode="lines",
+    name="GDP per Capita (Median)",
+    line=dict(width=3, color="#ff7f0e"),
+    yaxis="y2"
+))
+
+# CO2 (Right axis 2 — outside)
+fig.add_trace(go.Scatter(
+    x=yearly["year"],
+    y=yearly["median_co2"],
+    mode="lines",
+    name="CO₂ per Capita (Median)",
+    line=dict(width=3, color="#2ca02c"),
+    yaxis="y3"
+))
+
+# LAYOUT AND AXES
+fig.update_layout(
+    title="Global Trends: Life Expectancy, GDP, and CO₂ Over Time",
+    template="plotly_white",
+    hovermode="x unified",
+    width=850,
+    height=500,
+    legend_title="Toggle Variables",
+
+    # Y-Axis 1 (Life Expectancy)
+    yaxis=dict(
+        title=dict(text="Life Expectancy (Years)", font=dict(color="#1f77b4")),
+        tickfont=dict(color="#1f77b4"),
+        side="left"
+    ),
+
+    # Y-Axis 2 (GDP)
+    yaxis2=dict(
+        title=dict(text="GDP per Capita", font=dict(color="#ff7f0e")),
+        tickfont=dict(color="#ff7f0e"),
+        overlaying="y",
+        side="right",
+        position=.98
+    ),
+
+    # Y-Axis 3 (CO2)
+    yaxis3=dict(
+        title=dict(text="CO₂ per Capita", font=dict(color="#2ca02c")),
+        tickfont=dict(color="#2ca02c"),
+        overlaying="y",
+        side="right",
+        position=.9   # moved further to avoid overlap
+    ),
+
+    xaxis=dict(title="Year")
+)
+
+fig
+```
+
+```{=html}
+<button id="reset-axes-btn" style="
+  padding:8px 16px;
+  margin-bottom:15px;
+  border-radius:10px;
+  border:2px solid #38b3ffff;
+  background:#f5f5f5;
+  cursor:pointer;
+">
+Rest Axes
+</button>
+
+```{=html}
+<script>
+window.addEventListener("load", function () {
+
+  const plots = document.querySelectorAll(".js-plotly-plot");
+  if (plots.length === 0) return;
+  const plot = plots[plots.length - 1];
+
+  // Axis/trace definitions
+  const axisMap = {
+    0: { key: "yaxis",  title: "Life Expectancy (Years)" },
+    1: { key: "yaxis2", title: "GDP per Capita" },
+    2: { key: "yaxis3", title: "CO₂ per Capita" }
+  };
+
+  // Visibility state tracking
+  const axisVisible = { 0: true, 1: true, 2: true };
+
+  // Legend click handler
+  plot.on("plotly_legendclick", function(event) {
+    const traceIndex = event.curveNumber;
+    const info = axisMap[traceIndex];
+    if (!info) return;
+
+    // Flip stored visibility
+    axisVisible[traceIndex] = !axisVisible[traceIndex];
+
+    const update = {};
+    update[info.key + ".showticklabels"] = axisVisible[traceIndex];
+    update[info.key + ".title.text"] = axisVisible[traceIndex] ? info.title : "";
+
+    Plotly.relayout(plot, update);
+  });
+
+  // Reset button logic
+  const resetBtn = document.getElementById("reset-axes-btn");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", function () {
+
+      const fullUpdate = {};
+
+      // Restore every axis
+      Object.keys(axisMap).forEach(i => {
+        const info = axisMap[i];
+
+        axisVisible[i] = true;  // mark visible again
+        fullUpdate[info.key + ".showticklabels"] = true;
+        fullUpdate[info.key + ".title.text"] = info.title;
+      });
+
+      // Restore all traces (show all three lines)
+      const newVisibility = plot.data.map(() => true);
+
+      Plotly.update(plot, { visible: newVisibility });
+      Plotly.relayout(plot, fullUpdate);
+
+    });
+  }
+
+});
+</script>

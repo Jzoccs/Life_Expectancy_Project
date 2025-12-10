@@ -1,0 +1,32 @@
+---
+title: "Data Overview also we should show the links"
+format: html
+jupyter: python3
+execute:
+  echo: false        # hide the code, show only the table
+---
+
+```{python}
+
+import pandas as pd
+from itables import init_notebook_mode, show
+import itables
+itables.options.warn_on_undocumented_option = False
+
+# Enable interactive HTML tables
+init_notebook_mode(all_interactive=True)
+
+# Load the dataset
+df = pd.read_csv("../data/processed/merged_dataset_with_continents.csv")
+
+# Display with scrollable window and pagination
+show(
+    df,
+    paging=True,            # page controls
+    searchable=True,        # search bar
+    scrollY="450px",        # << SCROLLABLE HEIGHT
+    scrollX=True,           # horizontal scrolling if needed
+    lengthMenu=[10, 25, 50, 100],   # rows per page options
+    classes="display compact nowrap",  # clean styling
+)
+```
