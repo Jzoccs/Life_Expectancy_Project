@@ -3,21 +3,21 @@ project:
 
 website:
   title: "Life Expectancy Analysis"
-  sidebar:
-    style: "floating"
-    contents:
-      - index.qmd
-      - methodology.qmd
-      - analysis.qmd
-      - visualizations.qmd
-
+  navbar:
+    left:
+      - href: index.qmd
+        text: "Home"
+      - href: methodology.qmd
+        text: "Methodology"
+      - href: analysis.qmd
+        text: "Analysis"
+      - href: visualizations.qmd
+        text: "Visualizations"
 
 format:
   html:
-    theme: 
+    theme:
       light: flatly
       dark: darkly
     toc: true
     toc-location: left
-    roc-expand: true
-    code-fold: true
