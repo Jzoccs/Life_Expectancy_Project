@@ -142,26 +142,6 @@ def evaluate_model(name, y_test, y_pred):
     return {"rmse": rmse, "mae": mae, "r2": r2}
 
 
-# ---------- Baseline model: Linear Regression ----------
-
-
-def train_baseline_linear_regression(X_train, X_test, y_train, y_test):
-    """
-    Fit a simple Linear Regression model (with scaling) and evaluate it.
-    """
-    lin_pipeline = Pipeline(
-        steps=[
-            ("scaler", StandardScaler()),
-            ("model", LinearRegression()),
-        ]
-    )
-
-    lin_pipeline.fit(X_train, y_train)
-    y_pred_lin = lin_pipeline.predict(X_test)
-    lin_results = evaluate_model("Linear Regression (baseline)", y_test, y_pred_lin)
-
-    return lin_pipeline, y_pred_lin, lin_results
-
 
 # ---------- AutoML with FLAML ----------
 
@@ -214,7 +194,6 @@ def save_test_predictions(
     df_model,
     X_test,
     y_test,
-    y_pred_lin,
     y_pred_automl,
 ):
     """
@@ -227,7 +206,6 @@ def save_test_predictions(
 
     preds_df = df_model.loc[X_test.index].copy()
     preds_df["y_actual"] = y_test
-    preds_df["y_pred_linear"] = y_pred_lin
     preds_df["y_pred_automl"] = y_pred_automl
 
     preds_df.to_csv(output_path, index=False)
@@ -250,29 +228,71 @@ def main():
     # 4. Train / test split
     X_train, X_test, y_train, y_test = train_test_split_data(X, y)
 
-    # 5. Baseline Linear Regression
-    lin_pipeline, y_pred_lin, lin_results = train_baseline_linear_regression(
-        X_train, X_test, y_train, y_test
-    )
-
-    # 6. AutoML with FLAML
+    # 5. AutoML with FLAML
     automl, y_pred_automl, automl_results = train_automl_model(
         X_train, X_test, y_train, y_test, time_budget_seconds=60
     )
 
-    # 7. Save test predictions
+    # 6. Save test predictions
     save_test_predictions(
         df_model,
         X_test,
         y_test,
-        y_pred_lin,
         y_pred_automl,
     )
 
     print("\n=== SUMMARY ===")
-    print("Baseline Linear Regression:", lin_results)
     print("FLAML AutoML:", automl_results)
 
+
+def run_automl_experiment(time_budget_seconds=60, estimators=None):
+    """
+    Run a full AutoML experiment with flexible time budget and estimators. 
+    This allows users on a website to pick and test their favorite regression model
+
+    Parameters
+    ----------
+    time_budget_seconds : int
+        Total time FLAML can spend searching.
+    estimators : list[str] or None
+        List of estimator names (e.g. ["lgbm", "rf", "xgboost"]).
+        If None, uses a default list.
+    """
+    from flaml import AutoML
+
+    # 1. Load and prepare data
+    df = load_data()
+    X, y, df_model = prepare_features_and_target(df)
+    X_train, X_test, y_train, y_test = train_test_split_data(X, y)
+
+    # 2. Prepare AutoML settings
+    if estimators is None or len(estimators) == 0:
+        estimators = ["lgbm", "rf", "xgboost"]
+
+    automl = AutoML()
+    automl_settings = {
+        "time_budget": time_budget_seconds,
+        "metric": "r2",
+        "task": "regression",
+        "log_file_name": "automl_life_expectancy.log",
+        "estimator_list": estimators,
+        "seed": 42,
+    }
+
+    automl.fit(X_train=X_train, y_train=y_train, **automl_settings)
+
+    # 3. Evaluate on test set
+    y_pred_automl = automl.predict(X_test)
+    metrics = evaluate_model("FLAML AutoML", y_test, y_pred_automl)
+
+    return {
+        "automl": automl,
+        "X_test": X_test,
+        "y_test": y_test,
+        "y_pred": y_pred_automl,
+        "metrics": metrics,
+        "df_model": df_model,
+    }
 
 if __name__ == "__main__":
     main()

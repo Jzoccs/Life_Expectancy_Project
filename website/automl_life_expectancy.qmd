@@ -1,0 +1,174 @@
+---
+title: "Life Expectancy AutoML Explorer"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    embed-resources: true   # makes widgets work better on static HTML
+jupyter: python3
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+#| label: setup
+#| echo: false
+```{python}
+
+
+from pathlib import Path
+import pandas as pd
+
+from src.models.train_life_expectancy_model import (
+    load_data,
+    prepare_features_and_target,
+    train_test_split_data,
+    run_automl_experiment,
+)
+
+# Load data once so we can reuse it for summary visuals if needed
+df = load_data()
+X, y, df_model = prepare_features_and_target(df)
+```
+#| label: automl_widgets
+
+```{python}
+import ipywidgets as widgets
+from IPython.display import display, Markdown, clear_output
+
+model_options = ["lgbm", "rf", "xgboost"]
+
+model_selector = widgets.SelectMultiple(
+options=model_options,
+value=("lgbm", "rf", "xgboost"),
+description="Models:",
+layout=widgets.Layout(width="250px", height="110px"),
+)
+
+time_slider = widgets.IntSlider(
+value=60,
+min=10,
+max=300,
+step=10,
+description="Time (s):",
+continuous_update=False,
+)
+
+run_button = widgets.Button(
+description="Run AutoML",
+button_style="primary",
+tooltip="Run FLAML with the selected models and time budget",
+icon="play",
+)
+
+output = widgets.Output()
+
+controls_box = widgets.VBox(
+[
+widgets.HTML("<b>Choose model families and training time:</b>"),
+model_selector,
+time_slider,
+run_button,
+]
+)
+
+display(controls_box, output)
+
+def on_run_button_clicked(b):
+    with output:
+        clear_output()
+        chosen_models = list(model_selector.value)
+
+    if len(chosen_models) == 0:
+        chosen_models = model_options  # fallback
+
+    display(
+        Markdown(
+            f"### Running FLAML\n"
+            f"- Models: `{', '.join(chosen_models)}`  \n"
+            f"- Time budget: **{time_slider.value} seconds**"
+        )
+    )
+
+    results = run_automl_experiment(
+        time_budget_seconds=time_slider.value,
+        estimators=chosen_models,
+    )
+
+    metrics = results["metrics"]
+
+    display(
+        Markdown(
+            f"""
+            ### Performance (Test Set)
+
+            - RMSE: **{metrics['rmse']:.3f}**  
+            - MAE: **{metrics['mae']:.3f}**  
+            - R²: **{metrics['r2']:.3f}**
+            """
+        )
+    )
+
+    preview = pd.DataFrame(
+        {
+            "y_actual": results["y_test"],
+            "y_pred": results["y_pred"],
+        }
+    ).reset_index(drop=True).head(10)
+
+    display(Markdown("#### Example predictions (first 10 rows)"))
+    display(preview)
+
+    # Optional: interactive plotly scatter
+    try:
+        import plotly.express as px
+
+        fig = px.scatter(
+            preview,
+            x="y_actual",
+            y="y_pred",
+            title="Actual vs Predicted Life Expectancy (sample)",
+            labels={"y_actual": "Actual", "y_pred": "Predicted"},
+            trendline="ols",
+        )
+        fig.update_layout(height=450)
+        fig.show()
+    except ImportError:
+        display(
+            Markdown(
+                "_Install `plotly` to see an interactive actual-vs-predicted plot._"
+            )
+        )
+run_button.on_click(on_run_button_clicked)
+```
+
+```{python}
+#| label: static_explanation
+#| echo: false
+
+from IPython.display import Markdown
+
+Markdown(
+"""
+When you click **Run AutoML**:
+
+1. The dataset is split into train/test.
+2. FLAML searches over the selected model families (e.g. `lgbm`, `rf`, `xgboost`) within your chosen time budget.
+3. FLAML selects the configuration with the best cross-validated R².
+4. We evaluate that model on the held-out test set to compute RMSE, MAE, and R².
+
+**Interpretation tips:**
+
+* **RMSE** (Root Mean Squared Error): penalizes larger errors more. Smaller is better.
+* **MAE** (Mean Absolute Error): average absolute error in years of life expectancy.
+* **R²**: proportion of variance explained by the model (1 is perfect, 0 means no better than predicting the mean).
+
+Try:
+
+* Reducing the time budget to see how performance changes.
+* Restricting to a single model family (e.g. only `rf`) to compare vs a mix of models.
+  """
+  )
+  ```
