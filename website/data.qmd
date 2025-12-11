@@ -6,8 +6,6 @@ execute:
   echo: false
 ---
 
-# Data Sources
-
 This project uses three primary datasets retrieved from reputable external data providers.  
 Below are the official sources and descriptions:
 
