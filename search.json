@@ -1,0 +1,191 @@
+[
+  {
+    "objectID": "visualizations.html",
+    "href": "visualizations.html",
+    "title": "Visualizations",
+    "section": "",
+    "text": "This visualization shows the relationship between GDP per capita and life expectancy over time, with bubble sizes representing CO₂ emissions per capita and continents separated into facets."
+  },
+  {
+    "objectID": "visualizations.html#gdp-vs-life-expectancy-animated",
+    "href": "visualizations.html#gdp-vs-life-expectancy-animated",
+    "title": "Visualizations",
+    "section": "",
+    "text": "This visualization shows the relationship between GDP per capita and life expectancy over time, with bubble sizes representing CO₂ emissions per capita and continents separated into facets."
+  },
+  {
+    "objectID": "visualizations.html#life-expectancy-co2-emissions-per-capita-and-gdp-per-capita-trends-over-time",
+    "href": "visualizations.html#life-expectancy-co2-emissions-per-capita-and-gdp-per-capita-trends-over-time",
+    "title": "Visualizations",
+    "section": "Life Expectancy, CO2 Emissions per capita, and GDP per capita trends over time",
+    "text": "Life Expectancy, CO2 Emissions per capita, and GDP per capita trends over time\nThis shows the trends of Life Expectancy, CO2 Emisions Per Capita, and GDP Per Capita over our dataset’s years\n\n\n                            \n                                            \n\n\n\nRest Axes"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Life Expectancy Project",
+    "section": "",
+    "text": "This website presents our complete workflow for exploring, modeling, and visualizing global life expectancy using a socioeconomic and an environmental predictor.\nOur goal was to understand how a nation’s development and emissions relate to population health, and to build models that can predict life expectancy using accessible global indicators.\n\n\n\nThe interactive map below provides a quick visual overview of life expectancy values across countries.\n\n\n                            \n                                            \n\n\n\nBelow is a guide to what each page of this website contains:\n\n\n\nProvides a summary of the project goals, problem statement, and navigational overview of all sections.\n\n\n\n\nShows the raw, unprocessed datasets retrieved from:\n\nWorld Bank (GDP per capita)\nWorld Bank (Life Expectancy)\nOur World in Data (CO₂ emissions per capita)\n\nThis page provides transparency by previewing the original data before cleaning and merging.\n\n\n\n\nThis section describes the main steps we took for preparing the data, looking for important patterns, and creating a basis for our predictive modeling.\nIncluded:\n\nA timeline of how we collected, filtered, and combined the datasets\n\nVisualizations that show trends in life expectancy, GDP per capita, CO₂ emissions, and their connections\n\nCorrelation matrix to see how closely these variables are related\n\nComparisons between life expectancy of the countries with the greatest GDP per capita\n\nThese insights shaped our feature selection and influenced the modeling decisions made later in the analysis.\n\n\n\n\nIncludes:\n\nAnimated global scatterplots\n\nFaceted comparisons by continent\n\nMulti-axis trend charts for Life Expectancy, GDP, and CO₂\n\nInteractive widgets\n\nThese help uncover relationships that are not obvious from raw numbers.\n\n\n\n\nAn interactive dashboard where users can:\n\nSelect model families (LGBM, Random Forest, XGBoost)\n\nAdjust training time\n\nCompare algorithms by RMSE, MAE, and R²\n\nView prediction examples and plots\n\nThis showcases the modeling performance and results."
+  },
+  {
+    "objectID": "index.html#global-life-expectancy-map",
+    "href": "index.html#global-life-expectancy-map",
+    "title": "Life Expectancy Project",
+    "section": "",
+    "text": "The interactive map below provides a quick visual overview of life expectancy values across countries.\n\n\n                            \n                                            \n\n\n\nBelow is a guide to what each page of this website contains:"
+  },
+  {
+    "objectID": "index.html#home-you-are-here",
+    "href": "index.html#home-you-are-here",
+    "title": "Life Expectancy Project",
+    "section": "",
+    "text": "Provides a summary of the project goals, problem statement, and navigational overview of all sections."
+  },
+  {
+    "objectID": "index.html#data",
+    "href": "index.html#data",
+    "title": "Life Expectancy Project",
+    "section": "",
+    "text": "Shows the raw, unprocessed datasets retrieved from:\n\nWorld Bank (GDP per capita)\nWorld Bank (Life Expectancy)\nOur World in Data (CO₂ emissions per capita)\n\nThis page provides transparency by previewing the original data before cleaning and merging."
+  },
+  {
+    "objectID": "index.html#methodology",
+    "href": "index.html#methodology",
+    "title": "Life Expectancy Project",
+    "section": "",
+    "text": "This section describes the main steps we took for preparing the data, looking for important patterns, and creating a basis for our predictive modeling.\nIncluded:\n\nA timeline of how we collected, filtered, and combined the datasets\n\nVisualizations that show trends in life expectancy, GDP per capita, CO₂ emissions, and their connections\n\nCorrelation matrix to see how closely these variables are related\n\nComparisons between life expectancy of the countries with the greatest GDP per capita\n\nThese insights shaped our feature selection and influenced the modeling decisions made later in the analysis."
+  },
+  {
+    "objectID": "index.html#visualizations",
+    "href": "index.html#visualizations",
+    "title": "Life Expectancy Project",
+    "section": "",
+    "text": "Includes:\n\nAnimated global scatterplots\n\nFaceted comparisons by continent\n\nMulti-axis trend charts for Life Expectancy, GDP, and CO₂\n\nInteractive widgets\n\nThese help uncover relationships that are not obvious from raw numbers."
+  },
+  {
+    "objectID": "index.html#regression-analysis",
+    "href": "index.html#regression-analysis",
+    "title": "Life Expectancy Project",
+    "section": "",
+    "text": "An interactive dashboard where users can:\n\nSelect model families (LGBM, Random Forest, XGBoost)\n\nAdjust training time\n\nCompare algorithms by RMSE, MAE, and R²\n\nView prediction examples and plots\n\nThis showcases the modeling performance and results."
+  },
+  {
+    "objectID": "automl_life_expectancy.html",
+    "href": "automl_life_expectancy.html",
+    "title": "AutoML Life Expectancy Dashboard",
+    "section": "",
+    "text": "This page explores how different regression models predict life expectancy using a small set of economic and environmental features:\nWe start with an animated view of the raw data, then move into model comparison: a simple Linear Regression baseline and three tree-based models trained with FLAML AutoML:\nEach section of the page is designed to answer a specific question about model performance and behavior."
+  },
+  {
+    "objectID": "automl_life_expectancy.html#life-expectancy-for-each-regression-model",
+    "href": "automl_life_expectancy.html#life-expectancy-for-each-regression-model",
+    "title": "AutoML Life Expectancy Dashboard",
+    "section": "Life Expectancy for each Regression Model",
+    "text": "Life Expectancy for each Regression Model\nThis graph compares the global trend in life expectancy over time to what each regression model thinks that trend looks like.\nMore concretely:\nFor every year, the data first computes the average life expectancy across all countries in the test set. It does this both for the actual values (y_actual) and for the predictions from each model:\n\nLinear Regression\nLightGBM (AutoML)\nRandom Forest (AutoML)\nXGBoost (AutoML)\n\nThe plot then shows five lines over time: one line for the true global mean life expectancy, and one line for each model’s predicted global mean."
+  },
+  {
+    "objectID": "automl_life_expectancy.html#example-of-the-data-used",
+    "href": "automl_life_expectancy.html#example-of-the-data-used",
+    "title": "AutoML Life Expectancy Dashboard",
+    "section": "Example of the Data Used",
+    "text": "Example of the Data Used\nThe table below shows a sample of the test-set data that all of the AutoML visualizations are based on.\nEach row corresponds to a single country–year observation, and the columns mean:\n\nCountry – The country the observation comes from.\n\nYear – The year of the observation.\n\nActual – The true life expectancy (in years) from the dataset.\n\nLinear – The life expectancy predicted by the Linear Regression baseline model.\n\nLGBM – The prediction from the LightGBM (AutoML) model.\n\nRF – The prediction from the Random Forest (AutoML) model.\n\nXGBoost – The prediction from the XGBoost (AutoML) model.\n\nYou can use this sample to see how the models behave at the individual country level:\n\nFor some cases, the models are very close to the true value\n\ne.g., Mongolia 1993 (Actual ≈ 60.8, all models around 62–63).\n\n\nIn other cases, certain models overestimate or underestimate life expectancy\n\ne.g., Namibia 2009 (Actual ≈ 55.3, Linear Regression predicts over 66 years).\n\n\nDifferent models sometimes disagree with each other\n\ne.g., Iraq 2015 or Ethiopia 1991, where LGBM and XGBoost predict noticeably different values.\n\n\nThis is the same data used to build:\n\nthe error distribution plots,\n\nthe global mean life expectancy comparison, and\n\nthe model performance summaries elsewhere on this page.\n\n\n\n\n\n\n\n\n\n\nCountry\nYear\nActual\nLinear\nLGBM\nRF\nXGBoost\n\n\n\n\n0\nMongolia\n1993\n60.824220\n62.813935\n63.351031\n63.207014\n63.153885\n\n\n1\nNetherlands\n2001\n78.190244\n76.077297\n76.609169\n77.463067\n76.816400\n\n\n2\nGabon\n2005\n62.978000\n66.944917\n67.912951\n67.528558\n67.883780\n\n\n3\nIraq\n2015\n69.977000\n68.453716\n73.703125\n71.363042\n72.083460\n\n\n4\nNamibia\n2009\n55.347000\n66.208689\n62.037008\n63.414637\n61.578580\n\n\n5\nKuwait\n2003\n76.644561\n80.836042\n76.328738\n76.245024\n76.486730\n\n\n6\nSaudi Arabia\n2010\n75.616000\n76.999758\n76.911809\n76.772930\n76.807450\n\n\n7\nRwanda\n1992\n44.397000\n61.116001\n46.472547\n47.193931\n47.817066\n\n\n8\nPortugal\n2019\n81.675610\n73.612475\n80.127281\n80.283526\n80.208190\n\n\n9\nIceland\n1994\n79.247073\n72.200175\n77.684072\n77.642499\n77.710980\n\n\n10\nEthiopia\n2017\n64.766000\n66.911374\n62.373237\n62.437714\n62.059208\n\n\n11\nGreenland\n2021\n71.813902\n81.988097\n77.963407\n78.682981\n80.424560\n\n\n12\nSyrian Arab Republic\n2005\n72.797000\n65.138117\n72.090990\n70.497078\n71.523964\n\n\n13\nLao PDR\n2016\n67.014000\n67.729874\n71.922950\n72.281658\n72.273370\n\n\n14\nBolivia\n2005\n64.182000\n64.881282\n66.375317\n65.853058\n64.082080\n\n\n15\nGambia, The\n1996\n54.849000\n62.116098\n55.791025\n54.914084\n54.275190\n\n\n16\nCameroon\n1996\n53.200000\n62.311175\n60.238053\n60.429533\n60.553440\n\n\n17\nBosnia and Herzegovina\n2005\n76.424000\n65.928014\n71.345029\n69.728271\n69.322650\n\n\n18\nEthiopia\n1991\n46.657000\n60.860123\n45.315435\n46.663649\n45.165127\n\n\n19\nColombia\n2018\n76.579000\n68.986479\n75.268902\n75.513137\n76.257850\n\n\n20\nNepal\n2020\n69.106000\n67.795745\n65.645099\n66.657892\n67.174460\n\n\n21\nMicronesia, Fed. Sts.\n1994\n64.082000\n62.526746\n66.549900\n64.999154\n66.685000\n\n\n22\nBarbados\n2015\n76.055000\n72.147357\n76.022908\n74.380806\n78.464210\n\n\n23\nUkraine\n2009\n69.159000\n67.225032\n70.591364\n69.885342\n70.352190\n\n\n24\nIndonesia\n2007\n67.914000\n65.480711\n68.775066\n68.770679\n68.674520"
+  },
+  {
+    "objectID": "data.html",
+    "href": "data.html",
+    "title": "Data Sources & Raw Dataset Preview",
+    "section": "",
+    "text": "This project uses three primary datasets retrieved from reputable external data providers.\nBelow are the official sources and descriptions:"
+  },
+  {
+    "objectID": "data.html#world-bank-api-data",
+    "href": "data.html#world-bank-api-data",
+    "title": "Data Sources & Raw Dataset Preview",
+    "section": "World Bank API Data",
+    "text": "World Bank API Data\nTwo datasets were retrieved using the World Bank Indicators API:\n\nLife Expectancy at Birth (years)\nGDP per Capita"
+  },
+  {
+    "objectID": "data.html#co₂-emissions-data-our-world-in-data",
+    "href": "data.html#co₂-emissions-data-our-world-in-data",
+    "title": "Data Sources & Raw Dataset Preview",
+    "section": "CO₂ Emissions Data (Our World in Data)",
+    "text": "CO₂ Emissions Data (Our World in Data)\nThis dataset contains a multitude of CO₂ emission statistics. For this project we only focused on Co2 Per Capita:\n\nOur World in Data CO₂ Dataset (GitHub Repository)\nOWID CO₂ Dataset (GitHub)"
+  },
+  {
+    "objectID": "data.html#world-bank-life-expectancy-data",
+    "href": "data.html#world-bank-life-expectancy-data",
+    "title": "Data Sources & Raw Dataset Preview",
+    "section": "World Bank — Life Expectancy Data",
+    "text": "World Bank — Life Expectancy Data\nFile: data/raw/worldbank_life_expectancy_simple.csv\n\n\n\n\n\n\n\n\n\n\n    \n        \n        \n        \n        \n        \n        \n        \n        \n    \n    \n   \n    \n      \n  \n        \n    \n    \n  \n        \n    \n    \n  \n        \n    \n      \n  \n        \n            \n                \n                \n            \n\n            \n                \n                \n            \n\n            \n                \n                \n            \n\n            \n                \n                \n            \n\n            \n                \n                \n            \n        \n    \n\n\nThis is the init_notebook_mode cell from ITables v2.5.2\n(you should not see this message - is your notebook trusted?)\n\n\n\n\n\n\n    \n    \n    \n        \n        \n        \n        \n        \n        \n        \n        \n    \n    \n   \n    \n      \n  \n        \n    \n    \n  \n        \n    \n    \n  \n        \n    \n      \n  \n        \n            \n                \n                \n            \n\n            \n                \n                \n            \n\n            \n                \n                \n            \n\n            \n                \n                \n            \n\n            \n                \n                \n            \n        \n    \n\n\n    Loading ITables v2.5.2 from the init_notebook_mode cell...\n    (need help?)"
+  },
+  {
+    "objectID": "data.html#world-bank-gdp-per-capita-data",
+    "href": "data.html#world-bank-gdp-per-capita-data",
+    "title": "Data Sources & Raw Dataset Preview",
+    "section": "World Bank — GDP per Capita Data",
+    "text": "World Bank — GDP per Capita Data\nFile: data/raw/worldbank_gdp_per_capita_simple.csv\n\n\n\n\n    \n    \n    \n        \n        \n        \n        \n        \n        \n        \n        \n    \n    \n   \n    \n      \n  \n        \n    \n    \n  \n        \n    \n    \n  \n        \n    \n      \n  \n        \n            \n                \n                \n            \n\n            \n                \n                \n            \n\n            \n                \n                \n            \n\n            \n                \n                \n            \n\n            \n                \n                \n            \n        \n    \n\n\n    Loading ITables v2.5.2 from the init_notebook_mode cell...\n    (need help?)"
+  },
+  {
+    "objectID": "data.html#our-world-in-data-co₂-emissions-dataset",
+    "href": "data.html#our-world-in-data-co₂-emissions-dataset",
+    "title": "Data Sources & Raw Dataset Preview",
+    "section": "Our World in Data — CO₂ Emissions Dataset",
+    "text": "Our World in Data — CO₂ Emissions Dataset\nFile: data/external/owid-co2-data.csv\n\n\n\n\n    \n    \n    \n        \n        \n        \n        \n        \n        \n        \n        \n    \n    \n   \n    \n      \n  \n        \n    \n    \n  \n        \n    \n    \n  \n        \n    \n      \n  \n        \n            \n                \n                \n            \n\n            \n                \n                \n            \n\n            \n                \n                \n            \n\n            \n                \n                \n            \n\n            \n                \n                \n            \n        \n    \n\n\n    Loading ITables v2.5.2 from the init_notebook_mode cell...\n    (need help?)"
+  },
+  {
+    "objectID": "methodology.html",
+    "href": "methodology.html",
+    "title": "Methodology",
+    "section": "",
+    "text": "This page summarizes key exploratory data analysis (EDA) for the life-expectancy dataset used in the regression models.\nWe focus on how life expectancy, GDP per capita, CO₂ emissions per capita, and time are related, and how these patterns differ across major economies."
+  },
+  {
+    "objectID": "methodology.html#overview",
+    "href": "methodology.html#overview",
+    "title": "Methodology",
+    "section": "",
+    "text": "This page summarizes key exploratory data analysis (EDA) for the life-expectancy dataset used in the regression models.\nWe focus on how life expectancy, GDP per capita, CO₂ emissions per capita, and time are related, and how these patterns differ across major economies."
+  },
+  {
+    "objectID": "methodology.html#global-life-expectancy-over-time",
+    "href": "methodology.html#global-life-expectancy-over-time",
+    "title": "Methodology",
+    "section": "1. Global Life Expectancy Over Time",
+    "text": "1. Global Life Expectancy Over Time\nThe first plot tracks the global average life expectancy for each year in the dataset.\n\n\n\n\n\n\n\n\n\nWhat this shows\n\nThere is a steady upward trend from the early 1990s through the late 2010s.\nAverage life expectancy rises by several years over the period, reflecting broad improvements in health, medicine, and living standards.\nThe slight dip at the end of the series suggests recent shocks (COVID-19 Pandemic) that temporarily disrupt this long-run progress."
+  },
+  {
+    "objectID": "methodology.html#life-expectancy-vs.-gdp-per-capita",
+    "href": "methodology.html#life-expectancy-vs.-gdp-per-capita",
+    "title": "Methodology",
+    "section": "2. Life Expectancy vs. GDP per Capita",
+    "text": "2. Life Expectancy vs. GDP per Capita\nThis scatterplot relates log₁₀(GDP per capita) to life expectancy for all country-year observations.\n\n\n\n\n\n\n\n\n\nWhat this shows\n\nThere is a clear positive relationship: richer countries tend to have higher life expectancy.\nThe curve flattens at higher income levels, consistent with diminishing returns, once basic needs and health systems are in place, extra income buys smaller gains in longevity.\nThe spread at lower GDP levels highlights that countries with similar incomes can have quite different health outcomes."
+  },
+  {
+    "objectID": "methodology.html#relationship-between-gdp-and-co₂-emissions",
+    "href": "methodology.html#relationship-between-gdp-and-co₂-emissions",
+    "title": "Methodology",
+    "section": "3. Relationship Between GDP and CO₂ Emissions",
+    "text": "3. Relationship Between GDP and CO₂ Emissions\nHere we look at how economic activity is linked to CO₂ emissions, using log-transformed variables.\n\n\n\n\n\n\n\n\n\nWhat this shows\n\nThere is a strong positive correlation between log(GDP per capita) and log(CO₂ per capita).\nAs countries get richer, they generally emit more CO₂ per person, especially in the mid- to high-income ranges."
+  },
+  {
+    "objectID": "methodology.html#correlation-matrix-for-predictors-and-target",
+    "href": "methodology.html#correlation-matrix-for-predictors-and-target",
+    "title": "Methodology",
+    "section": "4. Correlation Matrix for Predictors and Target",
+    "text": "4. Correlation Matrix for Predictors and Target\nThe correlation heatmap summarizes linear relationships among the main variables used in the regression models.\n\n\n\n\n\n\n\n\n\nVariables\n\nlife_expectancy – target variable\n\ngdp_per_capita – economic development\n\nco2_per_capita – environmental pressure\n\nyear – time trend\n\nWhat this shows\n\nLife expectancy is moderately correlated with both GDP per capita and CO₂ per capita, reflecting the patterns seen in the scatterplots.\nGDP per capita and CO₂ per capita are themselves strongly correlated, which means the models have to disentangle two highly related predictors.\nYear has a weaker but positive correlation with life expectancy, capturing the overall upward trend over time.\n\nThese correlations support the modeling choice: all three predictors are informative, but also interrelated."
+  },
+  {
+    "objectID": "methodology.html#life-expectancy-in-the-top-5-gdp-economies",
+    "href": "methodology.html#life-expectancy-in-the-top-5-gdp-economies",
+    "title": "Methodology",
+    "section": "5. Life Expectancy in the Top 5 GDP Economies",
+    "text": "5. Life Expectancy in the Top 5 GDP Economies\nFinally, we examine life-expectancy trajectories for five countries with the highest GDP in the most recent year: United States, China, India, Japan, and Germany.\n\n\n\n\n\n\n\n\n\nWhat this shows\n\nAll five countries experience long-run improvements in life expectancy from 1990 onward.\nJapan and Germany sit at the top of the group, maintaining the highest levels throughout the period.\nChina and India show sharp gains, reflecting rapid development and improvements in health infrastructure.\nThe United States starts comparatively high but shows slower growth and a recent dip"
+  },
+  {
+    "objectID": "methodology.html#summary",
+    "href": "methodology.html#summary",
+    "title": "Methodology",
+    "section": "Summary",
+    "text": "Summary\nTogether, these EDA plots highlight several key themes:\n\nLife expectancy has improved globally, but not uniformly across countries or time.\nEconomic development (GDP per capita) is strongly associated with both higher life expectancy and higher CO₂ emissions, creating a tension between health and environmental sustainability.\nThe predictors used in the regression models—GDP per capita, CO₂ per capita, and year—each capture distinct but related aspects of this story, which is reflected in both the scatterplots and the correlation matrix."
+  }
+]
