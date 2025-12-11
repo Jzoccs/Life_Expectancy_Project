@@ -1,0 +1,188 @@
+---
+title: "AutoML Life Expectancy Dashboard"
+format:
+  dashboard:
+    theme: cosmo
+    css: styles.css
+jupyter: python3
+execute:
+  echo: false
+  warning: false
+  message: false
+
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+---
+
+```{python}
+from pathlib import Path
+import pandas as pd
+import plotly.express as px
+from IPython.display import Image
+
+project_root = Path.cwd().parent
+
+metrics = pd.read_csv(
+    project_root / "data" / "processed" / "model_comparison_metrics.csv"
+)
+preds = pd.read_csv(
+    project_root / "data" / "processed" / "test_predictions_life_expectancy_models.csv"
+)
+
+baseline = metrics[metrics["model"] == "linear_regression"].iloc[0]
+best_r2_row = metrics.loc[metrics["r2"].idxmax()]
+best_rmse_row = metrics.loc[metrics["rmse"].idxmin()]
+
+best_model_name = best_r2_row["model"]
+best_r2 = best_r2_row["r2"]
+best_rmse = best_rmse_row["rmse"]
+
+baseline_r2 = baseline["r2"]
+baseline_rmse = baseline["rmse"]
+
+r2_gain = best_r2 - baseline_r2
+rmse_drop = baseline_rmse - best_rmse
+
+# Paths to saved figures
+viz_dir = project_root / "src" / "visualizations" / "automl_regression"
+regression_png = viz_dir / "regression_model_comparison.png"
+error_dist_png = viz_dir / "error_distributions_by_model.png"
+```
+
+## Row
+
+```{python}
+#| content: valuebox
+#| title: "Baseline R² For Linear Regression"
+#| icon: border-style
+#| color: secondary
+dict(
+  value = f"{baseline_r2:.2f}",
+  subtitle = "Linear Regression (test set)"
+)
+```
+
+```{python}
+#| content: valuebox
+#| title: "Best R²"
+#| icon: graph-up
+#| color: primary
+dict(
+  value = f"{best_r2:.2f}",
+  subtitle = f"Best model: {best_model_name}"
+)
+```
+
+```{python}
+#| content: valuebox
+#| title: "Baseline RMSE"
+#| icon: speedometer
+#| color: secondary
+dict(
+  value = f"{baseline_rmse:.2f} yrs",
+  subtitle = "Linear Regression (test set)"
+)
+```
+
+```{python}
+#| content: valuebox
+#| title: "Improvement vs Linear"
+#| icon: arrow-up-circle
+#| color: success
+dict(
+  value = f"ΔR² = {r2_gain:.2f}",
+  subtitle = f"RMSE ↓ {rmse_drop:.2f} years vs baseline"
+)
+```
+
+## Row
+
+```{python}
+#| title: "Regression Model Comparison"
+Image(filename=str(regression_png), width=90)
+```
+
+```{python}
+#| title: "Error Distributions by Model"
+Image(filename=str(error_dist_png), width=90)
+```
+
+## Row 
+
+```{python}
+#| title: "Global Mean Life Expectancy: Actual vs Model Predictions"
+# Compute global average per year for actuals and all models
+series_cols = [
+    "y_actual",
+    "y_pred_linear_regression",
+    "y_pred_lgbm",
+    "y_pred_rf",
+    "y_pred_xgboost",
+]
+
+world = preds.groupby("year")[series_cols].mean().reset_index()
+
+world_long = world.melt(
+    id_vars="year",
+    value_vars=series_cols,
+    var_name="series",
+    value_name="life_expectancy",
+)
+
+series_labels = {
+    "y_actual": "Actual",
+    "y_pred_linear_regression": "Linear Regression",
+    "y_pred_lgbm": "LightGBM (AutoML)",
+    "y_pred_rf": "Random Forest (AutoML)",
+    "y_pred_xgboost": "XGBoost (AutoML)",
+}
+
+world_long["series"] = world_long["series"].map(series_labels)
+
+fig = px.line(
+    world_long,
+    x="year",
+    y="life_expectancy",
+    color="series",
+    labels={
+        "year": "Year",
+        "life_expectancy": "Mean life expectancy (years)",
+        "series": "Series",
+    },
+)
+fig.update_layout(
+    legend_title_text="",
+    hovermode="x unified",
+    height=260,
+    margin=dict(l=40, r=10, t=40, b=40),
+)
+
+```
+
+
+## Row
+
+```{python}
+#| title: "Test Set Predictions (sample)"
+preds_display = preds[
+    ["country_name", "year", "y_actual",
+     "y_pred_linear_regression", "y_pred_lgbm", "y_pred_rf", "y_pred_xgboost"]
+].copy()
+
+preds_display.rename(
+    columns={
+        "country_name": "Country",
+        "year": "Year",
+        "y_actual": "Actual",
+        "y_pred_linear_regression": "Linear",
+        "y_pred_lgbm": "LGBM",
+        "y_pred_rf": "RF",
+        "y_pred_xgboost": "XGBoost",
+    },
+    inplace=True,
+)
+
+preds_display.head(25)
+```
