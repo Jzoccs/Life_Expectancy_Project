@@ -1,7 +1,7 @@
 pandas
 plotly
 flaml
-flamal[automl]
+flaml[automl]
 lightgbm
 xgboost
 scikit-learn
