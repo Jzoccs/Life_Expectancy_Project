@@ -139,8 +139,8 @@ fig = px.line(
 fig.update_layout(
     legend_title_text="",
     hovermode="x unified",
+    width=850,
     height=500,
-    width=700,
     margin=dict(l=40, r=10, t=40, b=40),
 )
 

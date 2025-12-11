@@ -7,16 +7,14 @@ website:
     left:
       - href: index.qmd
         text: "Home"
-      - href: methodology.qmd
-        text: "Methodology"
-      - href: analysis.qmd
-        text: "Analysis"
-      - href: visualizations.qmd
-        text: "Visualizations"
       - href: data.qmd
         text: "Data"
+      - href: methodology.qmd
+        text: "Methodology"
+      - href: visualizations.qmd
+        text: "Visualizations"
       - href: automl_life_expectancy.qmd
-        text: Regression
+        text: "Regression Analysis"
 
 format:
   html:
