@@ -1,6 +1,7 @@
 ---
 title: "Life Expectancy Project"
 format: html
+jupyter: python3
 ---
 
 # Overview
@@ -8,9 +9,56 @@ format: html
 This website presents our complete workflow for exploring, modeling, and visualizing global **life expectancy** using a socioeconomic and an environmental predictor.  
 Our goal was to understand **how a nation’s development and emissions relate to population health**, and to build models that can predict life expectancy using accessible global indicators.
 
-Below is a guide to what each page of this website contains:
+---
+
+## Global Life Expectancy Map
+
+The interactive map below provides a quick visual overview of life expectancy values across countries.  
+
+```{python}
+import pandas as pd
+import plotly.express as px
+
+df = pd.read_csv("../data/processed/cleaned_life_expectancy_gdp_co2.csv")
+df_2021 = df[df["year"] == 2021]
+
+fig = px.choropleth(
+    df_2021,
+    locations="iso3",
+    color="life_expectancy",
+    hover_name="country_name",
+    projection="natural earth",
+    color_continuous_scale="Viridis",
+    labels={"life_expectancy": "Life Expectancy"}
+)
+
+fig.update_layout(
+    width=650,         
+    height=400,
+    title=dict(
+        text="Life Expectancy by Country (2021)",
+        y=0.84,
+        x=.5,            
+        xanchor="center",
+        yanchor="top"
+    ),         
+    coloraxis_colorbar=dict(
+        title="Life Expectancy (Years)",
+        ticks="outside",
+        len=0.55,       
+        thickness=12   
+    ),
+    margin=dict(l=0, r=0, t=50, b=0)
+)
+
+fig
+
+```
 
 ---
+
+Below is a guide to what each page of this website contains:
+
 
 ## Home (You are here)
 Provides a summary of the project goals, problem statement, and navigational overview of all sections.
