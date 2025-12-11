@@ -1,23 +1,27 @@
 """
-Train regression models to predict life expectancy using:
-- A simple Linear Regression baseline
-- An AutoML model from FLAML (tree-based regressors)
+Train and compare multiple regression models for life expectancy.
 
-This script expects the cleaned dataset:
-    data/processed/cleaned_life_expectancy_gdp_co2.csv
+This script:
+- Loads the cleaned life expectancy + GDP + CO2 dataset
+- Performs basic sanity checks and prepares features/target
+- Splits the data into train and test sets
+- Trains:
+    * A Linear Regression baseline (with standardization)
+    * Three FLAML AutoML models, each restricted to a single estimator
+      - lgbm
+      - rf (Random Forest)
+      - xgboost
+- Collects RMSE, MAE, and R² for each model
+- Saves a comparison table to:
+    data/processed/model_comparison_metrics.csv
 
-Steps:
-1. Load data
-2. Basic checks
-3. Prepare features & target
-4. Train/test split
-5. Train baseline Linear Regression
-6. Run FLAML AutoML for regression
-7. Evaluate and compare models
-8. Save test predictions to CSV
+You can then visualize these metrics in your Quarto website
+(e.g., bar charts comparing RMSE / MAE / R² by model).
 
 To run:
-    python src/models/train_life_expectancy_automl.py
+    python -m src.models.train_life_expectancy_models
+or:
+    python src/models/train_life_expectancy_models.py
 """
 
 from pathlib import Path
@@ -26,17 +30,15 @@ import numpy as np
 import pandas as pd
 from flaml import AutoML
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import (
-    mean_absolute_error,
-    mean_squared_error,
-    r2_score,
-)
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 
-# ---------- Data loading & preparation ----------
+# --------------------------------------------------------------------
+# Data loading & preparation helpers
+# --------------------------------------------------------------------
 
 
 def load_data() -> pd.DataFrame:
@@ -100,15 +102,17 @@ def prepare_features_and_target(df: pd.DataFrame):
     return X, y, df_model
 
 
-def train_test_split_data(X, y, test_size=0.2, random_state=42):
+def train_test_split_data(X, y, test_size: float = 0.2, random_state: int = 42):
     """
     Split the data into train and test sets.
 
     Parameters
     ----------
-    test_size : float
+    X, y :
+        Features and target.
+    test_size : float, default=0.2
         Fraction of data to use for testing.
-    random_state : int
+    random_state : int, default=42
         Seed for reproducibility.
     """
     X_train, X_test, y_train, y_test = train_test_split(
@@ -123,12 +127,23 @@ def train_test_split_data(X, y, test_size=0.2, random_state=42):
     return X_train, X_test, y_train, y_test
 
 
-# ---------- Evaluation helper ----------
-
-
-def evaluate_model(name, y_test, y_pred):
+def evaluate_model(name: str, y_test, y_pred) -> dict:
     """
-    Print evaluation metrics for a regression model.
+    Compute and print standard regression metrics.
+
+    Parameters
+    ----------
+    name : str
+        Name of the model (for printing).
+    y_test : array-like
+        True target values.
+    y_pred : array-like
+        Predicted target values.
+
+    Returns
+    -------
+    metrics : dict
+        Dictionary with keys: rmse, mae, r2.
     """
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
     mae = mean_absolute_error(y_test, y_pred)
@@ -142,32 +157,94 @@ def evaluate_model(name, y_test, y_pred):
     return {"rmse": rmse, "mae": mae, "r2": r2}
 
 
+# --------------------------------------------------------------------
+# Model training helpers
+# --------------------------------------------------------------------
 
-# ---------- AutoML with FLAML ----------
+
+def train_linear_baseline(X_train, X_test, y_train, y_test):
+    """
+    Train a simple Linear Regression model with standardization.
+
+    Parameters
+    ----------
+    X_train, X_test : pd.DataFrame or np.ndarray
+        Train and test feature matrices.
+    y_train, y_test : pd.Series or np.ndarray
+        Train and test targets.
+
+    Returns
+    -------
+    model : sklearn.Pipeline
+        Fitted pipeline (StandardScaler + LinearRegression).
+    y_pred : np.ndarray
+        Predictions on the test set.
+    metrics : dict
+        Dictionary with RMSE, MAE, and R² on the test set.
+    """
+    pipe = Pipeline(
+        [
+            ("scaler", StandardScaler()),
+            ("model", LinearRegression()),
+        ]
+    )
+
+    pipe.fit(X_train, y_train)
+    y_pred = pipe.predict(X_test)
+    metrics = evaluate_model("Linear Regression", y_test, y_pred)
+
+    return pipe, y_pred, metrics
 
 
-def train_automl_model(X_train, X_test, y_train, y_test, time_budget_seconds=60):
+def train_automl_model(
+    X_train,
+    X_test,
+    y_train,
+    y_test,
+    time_budget_seconds: int = 60,
+    estimator_list=None,
+):
     """
     Use FLAML AutoML to search for a good regression model.
 
     Parameters
     ----------
-    time_budget_seconds : int
-        Total time budget for AutoML search in seconds.
+    X_train, X_test : pd.DataFrame or np.ndarray
+        Train and test feature matrices.
+    y_train, y_test : pd.Series or np.ndarray
+        Train and test targets.
+    time_budget_seconds : int, default=60
+        Total time budget for the AutoML search in seconds.
+    estimator_list : list[str] or None, default=None
+        List of estimator names (e.g. ["lgbm", "rf", "xgboost"]).
+        If None or empty, uses a default list of tree-based models.
+
+    Returns
+    -------
+    automl : flaml.automl.AutoML
+        Fitted FLAML AutoML object.
+    y_pred_automl : np.ndarray
+        Predictions on the test set.
+    automl_results : dict
+        Metrics (RMSE, MAE, R²) on the test set.
     """
     automl = AutoML()
 
+    if estimator_list is None or len(estimator_list) == 0:
+        estimator_list = ["lgbm", "rf", "xgboost"]
+
     automl_settings = {
         "time_budget": time_budget_seconds,
-        "metric": "r2",          # optimize for R^2
+        "metric": "r2",  # optimize for R²
         "task": "regression",
         "log_file_name": "automl_life_expectancy.log",
-        # You can adjust this list; keeping it small for speed/clarity
-        "estimator_list": ["lgbm", "rf", "xgboost"],
+        "estimator_list": estimator_list,
         "seed": 42,
     }
 
     print("\n=== RUNNING FLAML AUTOML ===")
+    print("Estimators:", estimator_list)
+
     automl.fit(
         X_train=X_train,
         y_train=y_train,
@@ -176,50 +253,99 @@ def train_automl_model(X_train, X_test, y_train, y_test, time_budget_seconds=60)
 
     print("\nBest estimator type:", automl.best_estimator)
     print("Best config:", automl.best_config)
-    print("Best validation loss (1 - R^2):", automl.best_loss)
+    print("Best validation loss (1 - R²):", automl.best_loss)
     approx_val_r2 = 1 - automl.best_loss
-    print(f"Approx validation R^2: {approx_val_r2:0.3f}")
+    print(f"Approx validation R²: {approx_val_r2:0.3f}")
 
     # Evaluate on test set
     y_pred_automl = automl.predict(X_test)
-    automl_results = evaluate_model("FLAML AutoML", y_test, y_pred_automl)
+    automl_results = evaluate_model(
+        f"FLAML ({'+'.join(estimator_list)})", y_test, y_pred_automl
+    )
 
     return automl, y_pred_automl, automl_results
 
 
-# ---------- Save predictions ----------
-
-
-def save_test_predictions(
-    df_model,
-    X_test,
-    y_test,
-    y_pred_automl,
-):
+def train_all_models(X_train, X_test, y_train, y_test, total_time_budget: int = 240):
     """
-    Save a CSV containing the test rows with predictions from both models.
+    Train multiple models and collect metrics.
 
-    This is useful for your report and to let your instructor inspect predictions.
+    Trains:
+      - Linear Regression baseline
+      - FLAML AutoML constrained to each of: ["lgbm", "rf", "xgboost"]
+
+    The total_time_budget is split across the three AutoML runs.
+
+    Parameters
+    ----------
+    X_train, X_test : pd.DataFrame or np.ndarray
+    y_train, y_test : pd.Series or np.ndarray
+    total_time_budget : int, default=240
+        Total time budget in seconds to split across the FLAML runs.
+
+    Returns
+    -------
+    results : dict
+        Nested dictionary of the form:
+        {
+            "linear_regression": {
+                "model": fitted_model,
+                "y_pred": np.ndarray,
+                "metrics": {"rmse": ..., "mae": ..., "r2": ...},
+            },
+            "lgbm": {...},
+            "rf": {...},
+            "xgboost": {...},
+        }
     """
-    project_root = Path(__file__).resolve().parents[2]
-    output_path = project_root / "data" / "processed" / "test_predictions_life_expectancy_automl.csv"
+    results = {}
 
-    preds_df = df_model.loc[X_test.index].copy()
-    preds_df["y_actual"] = y_test
-    preds_df["y_pred_automl"] = y_pred_automl
+    # 1. Linear Regression baseline
+    lin_model, lin_pred, lin_metrics = train_linear_baseline(
+        X_train, X_test, y_train, y_test
+    )
+    results["linear_regression"] = {
+        "model": lin_model,
+        "y_pred": lin_pred,
+        "metrics": lin_metrics,
+    }
 
-    preds_df.to_csv(output_path, index=False)
-    print(f"\nSaved test predictions to {output_path}")
+    # 2. AutoML for each tree-based estimator separately
+    estimators = ["lgbm", "rf", "xgboost"]
+    per_model_budget = max(total_time_budget // len(estimators), 30)
+
+    for est in estimators:
+        print(f"\n=== AutoML for {est} only ===")
+        automl_model, y_pred, metrics = train_automl_model(
+            X_train,
+            X_test,
+            y_train,
+            y_test,
+            time_budget_seconds=per_model_budget,
+            estimator_list=[est],  # key: restrict AutoML to a single estimator
+        )
+        results[est] = {
+            "model": automl_model,
+            "y_pred": y_pred,
+            "metrics": metrics,
+        }
+
+    return results
 
 
-# ---------- Main script ----------
+# --------------------------------------------------------------------
+# Main entry point
+# --------------------------------------------------------------------
 
 
 def main():
+    """
+    End-to-end entry point to train all models and save metrics for the website.
+    """
     # 1. Load data
     df = load_data()
 
-    # 2. Basic checks (good for assignment write-up)
+    # 2. Basic checks
     basic_checks(df)
 
     # 3. Prepare features and target
@@ -228,71 +354,33 @@ def main():
     # 4. Train / test split
     X_train, X_test, y_train, y_test = train_test_split_data(X, y)
 
-    # 5. AutoML with FLAML
-    automl, y_pred_automl, automl_results = train_automl_model(
-        X_train, X_test, y_train, y_test, time_budget_seconds=60
+    # 5. Train all models (baseline + 3 AutoML variants)
+    all_results = train_all_models(
+        X_train, X_test, y_train, y_test, total_time_budget=240
     )
 
-    # 6. Save test predictions
-    save_test_predictions(
-        df_model,
-        X_test,
-        y_test,
-        y_pred_automl,
-    )
+    # Build a metrics DataFrame for plotting later
+    rows = []
+    for name, res in all_results.items():
+        m = res["metrics"]
+        rows.append(
+            {
+                "model": name,
+                "rmse": m["rmse"],
+                "mae": m["mae"],
+                "r2": m["r2"],
+            }
+        )
+    metrics_df = pd.DataFrame(rows)
+    print("\n=== COMPARISON TABLE ===")
+    print(metrics_df)
 
-    print("\n=== SUMMARY ===")
-    print("FLAML AutoML:", automl_results)
+    # 6. Save metrics for the website
+    project_root = Path(__file__).resolve().parents[2]
+    metrics_path = project_root / "data" / "processed" / "model_comparison_metrics.csv"
+    metrics_df.to_csv(metrics_path, index=False)
+    print(f"\nSaved model comparison metrics to {metrics_path}")
 
-
-def run_automl_experiment(time_budget_seconds=60, estimators=None):
-    """
-    Run a full AutoML experiment with flexible time budget and estimators. 
-    This allows users on a website to pick and test their favorite regression model
-
-    Parameters
-    ----------
-    time_budget_seconds : int
-        Total time FLAML can spend searching.
-    estimators : list[str] or None
-        List of estimator names (e.g. ["lgbm", "rf", "xgboost"]).
-        If None, uses a default list.
-    """
-    from flaml import AutoML
-
-    # 1. Load and prepare data
-    df = load_data()
-    X, y, df_model = prepare_features_and_target(df)
-    X_train, X_test, y_train, y_test = train_test_split_data(X, y)
-
-    # 2. Prepare AutoML settings
-    if estimators is None or len(estimators) == 0:
-        estimators = ["lgbm", "rf", "xgboost"]
-
-    automl = AutoML()
-    automl_settings = {
-        "time_budget": time_budget_seconds,
-        "metric": "r2",
-        "task": "regression",
-        "log_file_name": "automl_life_expectancy.log",
-        "estimator_list": estimators,
-        "seed": 42,
-    }
-
-    automl.fit(X_train=X_train, y_train=y_train, **automl_settings)
-
-    # 3. Evaluate on test set
-    y_pred_automl = automl.predict(X_test)
-    metrics = evaluate_model("FLAML AutoML", y_test, y_pred_automl)
-
-    return {
-        "automl": automl,
-        "X_test": X_test,
-        "y_test": y_test,
-        "y_pred": y_pred_automl,
-        "metrics": metrics,
-        "df_model": df_model,
-    }
 
 if __name__ == "__main__":
     main()
