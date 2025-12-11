@@ -1,32 +1,128 @@
 ---
-title: "Data Overview also we should show the links"
+title: "Data Sources & Raw Dataset Preview"
 format: html
 jupyter: python3
 execute:
-  echo: false        # hide the code, show only the table
+  echo: false
 ---
 
-```{python}
+# Data Sources
 
+This project uses three primary datasets retrieved from reputable external data providers.  
+Below are the official sources and descriptions:
+
+---
+
+## **World Bank API Data**
+Two datasets were retrieved using the World Bank Indicators API:
+
+- **Life Expectancy at Birth (years)**  
+
+- **GDP per Capita**  
+
+---
+
+## **CO₂ Emissions Data (Our World in Data)**  
+This dataset contains a multitude of CO₂ emission statistics. For this project we only focused on Co2 Per Capita:
+
+- **Our World in Data CO₂ Dataset (GitHub Repository)**  
+  [OWID CO₂ Dataset (GitHub)](https://github.com/owid/co2-data)
+
+
+---
+
+# Raw Dataset Preview
+
+Below you can preview each dataset as it was retrieved.
+
+---
+
+## **World Bank — Life Expectancy Data**
+_File: `data/raw/worldbank_life_expectancy_simple.csv`_
+
+```{python}
 import pandas as pd
 from itables import init_notebook_mode, show
 import itables
 itables.options.warn_on_undocumented_option = False
-
-# Enable interactive HTML tables
 init_notebook_mode(all_interactive=True)
 
-# Load the dataset
-df = pd.read_csv("../data/processed/merged_dataset_with_continents.csv")
-
-# Display with scrollable window and pagination
+life_df = pd.read_csv("../data/raw/worldbank_life_expectancy_simple.csv")
 show(
-    df,
-    paging=True,            # page controls
-    searchable=True,        # search bar
-    scrollY="450px",        # << SCROLLABLE HEIGHT
-    scrollX=True,           # horizontal scrolling if needed
-    lengthMenu=[10, 25, 50, 100],   # rows per page options
-    classes="display compact nowrap",  # clean styling
+    life_df,
+    paging=True,
+    searchable=True,
+    scrollY="400px",
+    scrollX=True,
+    lengthMenu=[10, 25, 50, 100],
+    classes="display compact nowrap"
 )
 ```
+
+---
+
+## **World Bank — GDP per Capita Data**
+_File: `data/raw/worldbank_gdp_per_capita_simple.csv`_
+
+```{python}
+gdp_df = pd.read_csv("../data/raw/worldbank_gdp_per_capita_simple.csv")
+
+show(
+    gdp_df,
+    paging=True,
+    searchable=True,
+    scrollY="400px",
+    scrollX=True,
+    lengthMenu=[10, 25, 50, 100],
+    classes="display compact nowrap"
+)
+```
+
+---
+
+## **Our World in Data — CO₂ Emissions Dataset**
+_File: `data/external/owid-co2-data.csv`_
+
+```{python}
+co2_raw = pd.read_csv("../data/external/owid-co2-data.csv")
+
+# Keep only the required columns
+co2_filtered = co2_raw[["iso_code", "year", "co2_per_capita"]].copy()
+
+# Filter to years >= 1990
+co2_filtered = co2_filtered[co2_filtered["year"] >= 1990]
+
+# Display interactive table
+show(
+    co2_filtered,
+    paging=True,
+    searchable=True,
+    scrollY="400px",
+    scrollX=True,
+    lengthMenu=[10, 25, 50, 100],
+    classes="display compact nowrap")
+```
+
+---
+
+# Notes
+
+- The raw datasets shown here represent the original inputs retrieved directly from the World Bank API and the OWID CO₂ repository.
+
+- Before modeling, the data undergoes multiple preprocessing steps, including:
+
+  - Filtering invalid or missing values as an example, there were many countries with no recorded CO₂ emissions before 1990.
+
+  - Selecting consistent time ranges. For CO₂ data, we start at 1990 to ensure every country has non-zero emissions and to avoid introducing bias from sparse early-century reporting.
+
+  - Renaming and restructuring columns for consistency across all sources.
+
+  - Merging datasets by ISO code (iso3) and year to create a unified analytic dataset containing life expectancy, GDP per capita, CO₂ per capita, and continent.
+
+  - Adding continent information from a lookup table to support geographic visualizations.
+
+- No modeling, scaling, or feature engineering is performed on this page. Its purpose is to provide full transparency into the exact raw inputs used before cleaning.
+
+- A fully cleaned and merged dataset is used in all modeling and visualization sections of this website.
+
+---
