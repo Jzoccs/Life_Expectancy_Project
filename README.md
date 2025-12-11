@@ -45,11 +45,6 @@ Life_Expectancy_Project/
 ├── README.md
 └── .gitignore
 
-### Installing
-
-* How/where to download your program
-* Any modifications needed to be made to files/folders
-
 ### Executing program
 
 1. Pull the external co2 dataset from https://github.com/owid/co2-data
