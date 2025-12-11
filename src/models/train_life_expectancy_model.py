@@ -332,11 +332,67 @@ def train_all_models(X_train, X_test, y_train, y_test, total_time_budget: int = 
 
     return results
 
+def build_and_save_test_predictions(
+    df_model: pd.DataFrame,
+    X_test: pd.DataFrame,
+    y_test: pd.Series,
+    all_results: dict,
+) -> pd.DataFrame:
+    """
+    Build a test-set predictions table for all models and save it as a CSV.
+
+    The output includes:
+      - ID / feature columns from the original data (for the test rows)
+      - the actual life_expectancy (y_actual)
+      - one prediction column per model, e.g. y_pred_linear_regression, y_pred_lgbm, ...
+
+    Returns
+    -------
+    test_df : pd.DataFrame
+        DataFrame with actuals and predictions for each model on the test set.
+    """
+    # Columns from the original cleaned dataset that you want to keep.
+    # This is flexible: only keep the ones that actually exist in df_model.
+    candidate_cols = [
+        "iso3",
+        "country_name",
+        "year",
+        "gdp_per_capita",
+        "co2_per_capita",
+        "life_expectancy",
+    ]
+    cols_to_keep = [c for c in candidate_cols if c in df_model.columns]
+
+    # Use X_test.index to grab the corresponding original rows from df_model
+    test_df = df_model.loc[X_test.index, cols_to_keep].copy()
+
+    # Rename life_expectancy -> y_actual (if present)
+    if "life_expectancy" in test_df.columns:
+        test_df = test_df.rename(columns={"life_expectancy": "y_actual"})
+    else:
+        # If it's missing for some reason, fall back to y_test
+        test_df["y_actual"] = y_test.values
+
+    # Add one prediction column per model
+    for model_name, res in all_results.items():
+        test_df[f"y_pred_{model_name}"] = res["y_pred"]
+
+    # Save to CSV
+    project_root = Path(__file__).resolve().parents[2]
+    preds_path = (
+        project_root
+        / "data"
+        / "processed"
+        / "test_predictions_life_expectancy_models.csv"
+    )
+    test_df.to_csv(preds_path, index=False)
+    print(f"\nSaved test predictions to {preds_path}")
+
+    return test_df
 
 # --------------------------------------------------------------------
 # Main entry point
 # --------------------------------------------------------------------
-
 
 def main():
     """
@@ -359,7 +415,15 @@ def main():
         X_train, X_test, y_train, y_test, total_time_budget=240
     )
 
-    # Build a metrics DataFrame for plotting later
+    # 5b. Build + save test predictions CSV (NEW)
+    test_predictions_df = build_and_save_test_predictions(
+        df_model=df_model,
+        X_test=X_test,
+        y_test=y_test,
+        all_results=all_results,
+    )
+
+    # 6. Build metrics DataFrame for plotting later (existing)
     rows = []
     for name, res in all_results.items():
         m = res["metrics"]
@@ -375,12 +439,11 @@ def main():
     print("\n=== COMPARISON TABLE ===")
     print(metrics_df)
 
-    # 6. Save metrics for the website
+    # 7. Save metrics for the website (existing)
     project_root = Path(__file__).resolve().parents[2]
     metrics_path = project_root / "data" / "processed" / "model_comparison_metrics.csv"
     metrics_df.to_csv(metrics_path, index=False)
     print(f"\nSaved model comparison metrics to {metrics_path}")
-
 
 if __name__ == "__main__":
     main()
