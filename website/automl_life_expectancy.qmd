@@ -1,20 +1,31 @@
 ---
 title: "AutoML Life Expectancy Dashboard"
-format:
-  dashboard:
-    theme: cosmo
-    css: styles.css
+format: html
 jupyter: python3
 execute:
-  echo: false
-  warning: false
-  message: false
-
-output:
-  flexdashboard::flex_dashboard:
-    orientation: rows
-    vertical_layout: scroll
+    echo: false     # hide all code
 ---
+
+
+This page explores how different regression models predict **life expectancy** using
+a small set of economic and environmental features:
+
+- **GDP per capita**
+- **CO₂ emissions per capita**
+- **Year**
+
+We start with an animated view of the raw data, then move into model comparison:
+a simple **Linear Regression** baseline and three tree-based models trained with
+**FLAML AutoML**:
+
+- **LightGBM (LGBM)** – a fast gradient boosting model
+- **Random Forest (RF)** – an ensemble of decision trees
+- **XGBoost** – a powerful gradient boosting algorithm
+
+Each section of the page is designed to answer a specific question about model
+performance and behavior.
+
+
 
 ```{python}
 from pathlib import Path
@@ -47,69 +58,40 @@ rmse_drop = baseline_rmse - best_rmse
 
 # Paths to saved figures
 viz_dir = project_root / "src" / "visualizations" / "automl_regression"
-regression_png = viz_dir / "regression_model_comparison.png"
+rmse_mae_png = viz_dir / "regression_rmse_mae_comparison.png"
+r2_png = viz_dir / "regression_r2_comparison.png"
 error_dist_png = viz_dir / "error_distributions_by_model.png"
 ```
 
-## Row
 
 ```{python}
-#| content: valuebox
-#| title: "Baseline R² For Linear Regression"
-#| icon: border-style
-#| color: secondary
-dict(
-  value = f"{baseline_r2:.2f}",
-  subtitle = "Linear Regression (test set)"
-)
+#| title: "R Squared Calculations"
+Image(filename=str(r2_png), width=1000)
+```
+```{python}
+#| title: "RMSE and MAE Comparison"
+Image(filename=str(rmse_mae_png), width=1000)
 ```
 
 ```{python}
-#| content: valuebox
-#| title: "Best R²"
-#| icon: graph-up
-#| color: primary
-dict(
-  value = f"{best_r2:.2f}",
-  subtitle = f"Best model: {best_model_name}"
-)
+#| title: "Error Distributions by Model" 
+Image(filename=str(error_dist_png), width=1000)
 ```
 
-```{python}
-#| content: valuebox
-#| title: "Baseline RMSE"
-#| icon: speedometer
-#| color: secondary
-dict(
-  value = f"{baseline_rmse:.2f} yrs",
-  subtitle = "Linear Regression (test set)"
-)
-```
+## This graph compares the global trend in life expectancy over time to what each regression model thinks that trend looks like.
 
-```{python}
-#| content: valuebox
-#| title: "Improvement vs Linear"
-#| icon: arrow-up-circle
-#| color: success
-dict(
-  value = f"ΔR² = {r2_gain:.2f}",
-  subtitle = f"RMSE ↓ {rmse_drop:.2f} years vs baseline"
-)
-```
+More concretely:
 
-## Row
+For every year, the data first computes the average life expectancy across all countries in the test set.
+It does this both for the actual values (y_actual) and for the predictions from each model:
 
-```{python}
-#| title: "Regression Model Comparison"
-Image(filename=str(regression_png), width=90)
-```
+- **Linear Regression**
+- **LightGBM (AutoML)**
+- **Random Forest (AutoML)**
+- **XGBoost (AutoML)**
 
-```{python}
-#| title: "Error Distributions by Model"
-Image(filename=str(error_dist_png), width=90)
-```
-
-## Row 
+The plot then shows five lines over time: one line for the true global mean life expectancy,
+and one line for each model’s predicted global mean.
 
 ```{python}
 #| title: "Global Mean Life Expectancy: Actual vs Model Predictions"
@@ -155,14 +137,42 @@ fig = px.line(
 fig.update_layout(
     legend_title_text="",
     hovermode="x unified",
-    height=260,
+    height=500,
+    width=700,
     margin=dict(l=40, r=10, t=40, b=40),
 )
 
 ```
 
+## Example of the Data Used
 
-## Row
+The table below shows a **sample of the test-set data** that all of the AutoML visualizations are based on.  
+
+Each row corresponds to a **single country–year** observation, and the columns mean:
+
+- **Country** – The country the observation comes from.  
+- **Year** – The year of the observation.  
+- **Actual** – The **true** life expectancy (in years) from the dataset.  
+- **Linear** – The life expectancy predicted by the **Linear Regression** baseline model.  
+- **LGBM** – The prediction from the **LightGBM (AutoML)** model.  
+- **RF** – The prediction from the **Random Forest (AutoML)** model.  
+- **XGBoost** – The prediction from the **XGBoost (AutoML)** model.  
+
+You can use this sample to see how the models behave at the individual country level:
+
+- For some cases, the models are **very close** to the true value  
+  - e.g., **Mongolia 1993** (Actual ≈ 60.8, all models around 62–63).  
+- In other cases, certain models **overestimate** or **underestimate** life expectancy  
+  - e.g., **Namibia 2009** (Actual ≈ 55.3, Linear Regression predicts over 66 years).  
+- Different models sometimes **disagree with each other**  
+  - e.g., **Iraq 2015** or **Ethiopia 1991**, where LGBM and XGBoost predict noticeably different values.
+
+This is the same data used to build:
+
+- the **error distribution** plots,  
+- the **global mean life expectancy** comparison, and  
+- the **model performance summaries** elsewhere on this page.
+
 
 ```{python}
 #| title: "Test Set Predictions (sample)"
