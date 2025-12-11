@@ -1,15 +1,92 @@
 ---
 title: "Life Expectancy Project"
+format: html
 ---
 
 # Overview
 
-Welcome to my Life Expectancy Analysis Project.
+This website presents our complete workflow for exploring, modeling, and visualizing global **life expectancy** using a socioeconomic and an environmental predictor.  
+Our goal was to understand **how a nation’s development and emissions relate to population health**, and to build models that can predict life expectancy using accessible global indicators.
 
-This website summarizes:
+Below is a guide to what each page of this website contains:
 
-- the dataset and variables
-- methodology and modeling
-- exploratory analysis
-- machine learning results
-- interactive visualizations
+---
+
+## Home (You are here)
+Provides a summary of the project goals, problem statement, and navigational overview of all sections.
+
+---
+
+## Data
+Shows the **raw, unprocessed datasets** retrieved from:
+
+- World Bank (GDP per capita)
+- World Bank (Life Expectancy)
+- Our World in Data (CO₂ emissions per capita)
+
+This page provides transparency by previewing the original data before cleaning and merging.
+
+---
+
+## Methodology
+idk yet
+
+---
+
+## Visualizations
+Includes:
+
+- Animated global scatterplots  
+- Faceted comparisons by continent  
+- Multi-axis trend charts for Life Expectancy, GDP, and CO₂  
+- Interactive widgets  
+
+These help uncover relationships that are not obvious from raw numbers.
+
+---
+
+## Regression Analysis
+An interactive dashboard where users can:
+
+- Select model families (LGBM, Random Forest, XGBoost)  
+- Adjust training time  
+- Compare algorithms by RMSE, MAE, and R²  
+- View prediction examples and plots  
+
+This showcases the modeling performance and results.
+
+---
+
+# Problem Statement
+
+**How can we estimate a country’s life expectancy using accessible global indicators like GDP per capita and CO₂ emissions per capita?**
+
+It is widely known that higher income levels are linked to better health and longer lifespans. However, we wanted to explore two questions within our dataset:
+
+- How strong is the relationship between GDP per capita and life expectancy?
+- Do CO₂ emissions per capita provide any additional insights that explain differences between countries?
+
+GDP per capita reflects general economic conditions, which often affect healthcare quality, nutrition, and public resources. CO₂ emissions per capita, while not a direct health measure, can indicate levels of industrial activity and development.
+
+By including both variables, our aim was simply to see:
+
+- Whether CO₂ helps improve prediction accuracy
+- Whether economic and environmental indicators together offer a clearer picture than GDP alone
+
+Our goal is not to make causal claims, but to create reasonable predictive models and examine patterns in the data.
+
+---
+
+# Approach
+
+To answer these questions, we:
+
+- Retrieved publicly available global datasets  
+- Cleaned, filtered, and merged them into one analytical dataset  
+- Explored trends and correlations using visualizations  
+- Used AutoML to test multiple regression models  
+- Compared model performance using RMSE, MAE, and R²  
+
+Each page of this website walks through a different part of that process.
+
+---
