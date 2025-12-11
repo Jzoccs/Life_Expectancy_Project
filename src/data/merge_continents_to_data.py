@@ -1,9 +1,8 @@
 import pandas as pd
 from pathlib import Path
 
-# ---------------------------------------------
+'''This merges the cleaned data with the continents csv to give each record its corresponding continent'''
 # Paths
-# ---------------------------------------------
 project_root = Path(__file__).resolve().parents[2]
 
 raw_dir = project_root / "data" / "raw"
@@ -14,20 +13,17 @@ continents_path = raw_dir / "continents.csv"
 
 output_path = processed_dir / "merged_dataset_with_continents.csv"
 
-# ---------------------------------------------
+
 # Load datasets
-# ---------------------------------------------
 df = pd.read_csv(cleaned_path)
 df_cont = pd.read_csv(continents_path)
 
-# ---------------------------------------------
+
 # Merge Continents (ONLY on iso3)
-# ---------------------------------------------
 df = df.merge(df_cont, on="iso3", how="left")
 
-# ---------------------------------------------
+
 # Save output
-# ---------------------------------------------
 processed_dir.mkdir(parents=True, exist_ok=True)
 df.to_csv(output_path, index=False)
 

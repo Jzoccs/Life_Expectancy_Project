@@ -88,7 +88,7 @@ def prepare_features_and_target(df: pd.DataFrame):
     target_variable = "life_expectancy"
     feature_variables = ["gdp_per_capita", "co2_per_capita", "year"]
 
-    # Keep only rows without missing values in X or y
+    #Keep only rows without missing values in X or y
     df_model = df.dropna(subset=feature_variables + [target_variable]).copy()
 
     X = df_model[feature_variables]
@@ -155,11 +155,6 @@ def evaluate_model(name: str, y_test, y_pred) -> dict:
     print(f"R^2 : {r2:0.3f}")
 
     return {"rmse": rmse, "mae": mae, "r2": r2}
-
-
-# --------------------------------------------------------------------
-# Model training helpers
-# --------------------------------------------------------------------
 
 
 def train_linear_baseline(X_train, X_test, y_train, y_test):
@@ -389,10 +384,6 @@ def build_and_save_test_predictions(
     print(f"\nSaved test predictions to {preds_path}")
 
     return test_df
-
-# --------------------------------------------------------------------
-# Main entry point
-# --------------------------------------------------------------------
 
 def main():
     """

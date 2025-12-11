@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 from pathlib import Path
 
+'''API for the gdp per capita csv from worldbank.org'''
 
 def main():
     #World Bank indicator for GDP per capita (constant 2015 US$)

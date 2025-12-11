@@ -1,7 +1,9 @@
 import os
 import pandas as pd
 
-
+'''
+This merges three csv's into one processed csv that we will then perform cleaning on
+'''
 def main():
     #1. Read the two World Bank CSVs
     life_df = pd.read_csv("data/raw/worldbank_life_expectancy_simple.csv")
