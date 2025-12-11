@@ -21,6 +21,11 @@ execute:
 from pathlib import Path
 import pandas as pd
 
+import sys, os
+sys.path.append(os.path.abspath(".."))          # parent folder
+sys.path.append(os.path.abspath("."))           # current project root
+sys.path.append(os.path.abspath("../src"))      # direct path to src
+
 from src.models.train_life_expectancy_model import (
     load_data,
     prepare_features_and_target,
