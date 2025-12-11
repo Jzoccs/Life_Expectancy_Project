@@ -1,174 +1,129 @@
 ---
-title: "Life Expectancy AutoML Explorer"
+title: "Life Expectancy Model Comparison"
 format:
   html:
     theme: cosmo
     toc: true
     toc-depth: 3
     code-fold: true
-    embed-resources: true   # makes widgets work better on static HTML
+    embed-resources: true
 jupyter: python3
 execute:
   echo: false
   warning: false
   message: false
 ---
-#| label: setup
-#| echo: false
+
+# Overview
+
+This page compares several regression models trained to predict **life expectancy** from
+GDP per capita, CO₂ emissions per capita, and year.
+
+The models included are:
+
+- Linear Regression (with standardization)
+- FLAML AutoML restricted to:
+  - `lgbm` (Light Gradient Boosting)
+  - `rf` (Random Forest)
+  - `xgboost` (Extreme Gradient Boosting)
+
+The script `src/models/train_life_expectancy_models.py` was run beforehand to:
+
+1. Load and clean the data  
+2. Train all models  
+3. Evaluate each model on a held-out test set  
+4. Save the metrics to `data/processed/model_comparison_metrics.csv`
+
+Below we load those metrics and visualize the differences.
+
 ```{python}
+#| label: load-metrics
 
-
-from pathlib import Path
 import pandas as pd
 
-from src.models.train_life_expectancy_model import (
-    load_data,
-    prepare_features_and_target,
-    train_test_split_data,
-    run_automl_experiment,
-)
+# Path is relative to the website/ folder
+metrics_path = "../data/processed/model_comparison_metrics.csv"
+metrics_df = pd.read_csv(metrics_path)
 
-# Load data once so we can reuse it for summary visuals if needed
-df = load_data()
-X, y, df_model = prepare_features_and_target(df)
+metrics_df
 ```
-#| label: automl_widgets
+# Make a "long" version of the metrics for easier plotting
 
 ```{python}
-import ipywidgets as widgets
-from IPython.display import display, Markdown, clear_output
+#| label: metrics-long
 
-model_options = ["lgbm", "rf", "xgboost"]
 
-model_selector = widgets.SelectMultiple(
-options=model_options,
-value=("lgbm", "rf", "xgboost"),
-description="Models:",
-layout=widgets.Layout(width="250px", height="110px"),
+long_df = metrics_df.melt(
+id_vars="model",
+value_vars=["rmse", "mae", "r2"],
+var_name="metric",
+value_name="value",
 )
 
-time_slider = widgets.IntSlider(
-value=60,
-min=10,
-max=300,
-step=10,
-description="Time (s):",
-continuous_update=False,
-)
+long_df
 
-run_button = widgets.Button(
-description="Run AutoML",
-button_style="primary",
-tooltip="Run FLAML with the selected models and time budget",
-icon="play",
-)
+#| label: bar-charts
+#| fig-cap: "RMSE, MAE, and R² for each model"
 
-output = widgets.Output()
+import plotly.express as px
 
-controls_box = widgets.VBox(
-[
-widgets.HTML("<b>Choose model families and training time:</b>"),
-model_selector,
-time_slider,
-run_button,
-]
-)
+# One combined bar chart with facets by metric
 
-display(controls_box, output)
-
-def on_run_button_clicked(b):
-    with output:
-        clear_output()
-        chosen_models = list(model_selector.value)
-
-    if len(chosen_models) == 0:
-        chosen_models = model_options  # fallback
-
-    display(
-        Markdown(
-            f"### Running FLAML\n"
-            f"- Models: `{', '.join(chosen_models)}`  \n"
-            f"- Time budget: **{time_slider.value} seconds**"
-        )
-    )
-
-    results = run_automl_experiment(
-        time_budget_seconds=time_slider.value,
-        estimators=chosen_models,
-    )
-
-    metrics = results["metrics"]
-
-    display(
-        Markdown(
-            f"""
-            ### Performance (Test Set)
-
-            - RMSE: **{metrics['rmse']:.3f}**  
-            - MAE: **{metrics['mae']:.3f}**  
-            - R²: **{metrics['r2']:.3f}**
-            """
-        )
-    )
-
-    preview = pd.DataFrame(
-        {
-            "y_actual": results["y_test"],
-            "y_pred": results["y_pred"],
-        }
-    ).reset_index(drop=True).head(10)
-
-    display(Markdown("#### Example predictions (first 10 rows)"))
-    display(preview)
-
-    # Optional: interactive plotly scatter
-    try:
-        import plotly.express as px
-
-        fig = px.scatter(
-            preview,
-            x="y_actual",
-            y="y_pred",
-            title="Actual vs Predicted Life Expectancy (sample)",
-            labels={"y_actual": "Actual", "y_pred": "Predicted"},
-            trendline="ols",
-        )
-        fig.update_layout(height=450)
-        fig.show()
-    except ImportError:
-        display(
-            Markdown(
-                "_Install `plotly` to see an interactive actual-vs-predicted plot._"
+fig = px.bar(
+            long_df,
+            x="model",
+            y="value",
+            color="model",
+            facet_col="metric",
+            facet_col_wrap=3,
+            text_auto=".3f",
+            title="Model performance by metric",
             )
-        )
-run_button.on_click(on_run_button_clicked)
-```
 
-```{python}
-#| label: static_explanation
+# Make it a bit nicer
+
+fig.update_layout(
+                showlegend=False,
+                height=500,)
+fig.update_yaxes(matches=None)  # allow different ranges per facet
+
+fig.show()
+
+
+#| label: best-models
 #| echo: false
 
 from IPython.display import Markdown
 
-Markdown(
-"""
-When you click **Run AutoML**:
+# Lower is better for RMSE & MAE, higher is better for R²
 
-1. The dataset is split into train/test.
-2. FLAML searches over the selected model families (e.g. `lgbm`, `rf`, `xgboost`) within your chosen time budget.
-3. FLAML selects the configuration with the best cross-validated R².
-4. We evaluate that model on the held-out test set to compute RMSE, MAE, and R².
+best_rmse_row = metrics_df.loc[metrics_df["rmse"].idxmin()]
+best_mae_row = metrics_df.loc[metrics_df["mae"].idxmin()]
+best_r2_row = metrics_df.loc[metrics_df["r2"].idxmax()]
 
-**Interpretation tips:**
+summary_md = f"""
+```
+## Which model performs best?
 
-* **RMSE** (Root Mean Squared Error): penalizes larger errors more. Smaller is better.
-* **MAE** (Mean Absolute Error): average absolute error in years of life expectancy.
-* **R²**: proportion of variance explained by the model (1 is perfect, 0 means no better than predicting the mean).
+Based on the held-out test set:
 
-Try:
-
-* Reducing the time budget to see how performance changes.
-* Restricting to a single model family (e.g. only `rf`) to compare vs a mix of models.
-  """
-  )
+* **Lowest RMSE**: `{best_rmse_row['model']}`
+  ```{python}(RMSE = {best_rmse_row['rmse']:.3f})
   ```
+
+* **Lowest MAE**: `{best_mae_row['model']}`
+ ```{python} (MAE = {best_mae_row['mae']:.3f})
+```
+
+* **Highest R²**: `{best_r2_row['model']}`
+  (R² = {best_r2_row['r2']:.3f})
+
+Remember:
+
+* **RMSE** and **MAE** (lower is better) measure how far predictions are from
+  true life expectancy, in years.
+* **R²** (higher is better) measures how much of the variability in life
+  expectancy is explained by the model.
+  """
+
+Markdown(summary_md)
