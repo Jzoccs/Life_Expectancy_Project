@@ -78,8 +78,17 @@ This page provides transparency by previewing the original data before cleaning 
 
 ---
 
-## Methodology
-idk yet
+## Methodology  
+This section describes the main steps we took for preparing the data, looking for important patterns, and creating a basis for our predictive modeling. 
+
+Included:  
+
+- A timeline of how we collected, filtered, and combined the datasets  
+- Visualizations that show trends in life expectancy, GDP per capita, CO₂ emissions, and their connections  
+- Correlation matrix to see how closely these variables are related  
+- Comparisons between life expectancy of the countries with the greatest GDP per capita  
+
+These insights shaped our feature selection and influenced the modeling decisions made later in the analysis.  
 
 ---
 
