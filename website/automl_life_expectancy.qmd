@@ -78,7 +78,9 @@ Image(filename=str(rmse_mae_png), width=1000)
 Image(filename=str(error_dist_png), width=1000)
 ```
 
-## This graph compares the global trend in life expectancy over time to what each regression model thinks that trend looks like.
+## Life Expectancy for each Regression Model
+
+This graph compares the global trend in life expectancy over time to what each regression model thinks that trend looks like.
 
 More concretely:
 
