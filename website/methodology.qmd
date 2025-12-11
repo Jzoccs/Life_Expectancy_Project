@@ -1,13 +1,133 @@
 ---
 title: "Methodology"
+format: html
+execute:
+  echo: false
+jupyter: python3
 ---
 
-# Methodology
+```{python}
+from pathlib import Path
+from IPython.display import Image
 
-Describe:
+# Base paths for saved EDA figures
+project_root = Path.cwd().parent
+eda_dir = project_root / "src" / "visualizations" / "exploratory_data_analysis"
 
-- Dataset sources (from /data/raw and /data/processed)
-- Preprocessing pipeline (src/ scripts)
-- Feature engineering
-- Model selection
-- Train/test split
+life_expectancy_trend_png = eda_dir / "global_life_expectancy_over_time.png"
+gdp_vs_life_png = eda_dir / "life_expectancy_vs_log_gdp.png"
+gdp_vs_co2_png = eda_dir / "log_gdp_vs_log_co2_scatter.png"
+corr_png = eda_dir / "correlation_matrix_predictors.png"
+top5_gdp_life_png = eda_dir / "top5_gdp_countries_life_expectancy_over_time.png"
+```
+
+## Overview
+
+This page summarizes key exploratory data analysis (EDA) for the life-expectancy dataset used in the regression models.  
+We focus on how **life expectancy**, **GDP per capita**, **CO₂ emissions per capita**, and **time** are related, and how these
+patterns differ across major economies.
+
+---
+
+## 1. Global Life Expectancy Over Time
+
+The first plot tracks the **global average life expectancy** for each year in the dataset.
+
+```{python}
+#| title: "Global Average Life Expectancy Over Time"
+Image(filename=str(life_expectancy_trend_png), width=1000)
+```
+
+**What this shows**
+
+- There is a **steady upward trend** from the early 1990s through the late 2010s.
+- Average life expectancy rises by several years over the period, reflecting broad improvements in health, medicine, and living standards.
+- The slight **dip** at the end of the series suggests recent shocks (COVID-19 Pandemic) that temporarily disrupt this long-run progress.
+
+---
+
+## 2. Life Expectancy vs. GDP per Capita
+
+This scatterplot relates **log₁₀(GDP per capita)** to **life expectancy** for all country-year observations.
+
+```{python}
+#| title: "Life Expectancy vs GDP per Capita"
+Image(filename=str(gdp_vs_life_png), width=1000)
+```
+
+**What this shows**
+
+- There is a clear **positive relationship**: richer countries tend to have higher life expectancy.
+- The curve flattens at higher income levels, consistent with **diminishing returns**, once basic needs and health systems are in place, extra income buys smaller gains in longevity.
+- The spread at lower GDP levels highlights that countries with similar incomes can have quite different health outcomes.
+
+---
+
+## 3. Relationship Between GDP and CO₂ Emissions
+
+Here we look at how **economic activity** is linked to **CO₂ emissions**, using log-transformed variables.
+
+```{python}
+#| title: "Relationship Between GDP and CO₂ Emissions"
+Image(filename=str(gdp_vs_co2_png), width=1000)
+```
+
+**What this shows**
+
+- There is a **strong positive correlation** between log(GDP per capita) and log(CO₂ per capita).
+- As countries get richer, they generally emit **more CO₂ per person**, especially in the mid- to high-income ranges.
+
+---
+
+## 4. Correlation Matrix for Predictors and Target
+
+The correlation heatmap summarizes linear relationships among the main variables used in the regression models.
+
+```{python}
+#| title: "Correlation Matrix: Predictors and Target"
+Image(filename=str(corr_png), width=800)
+```
+
+**Variables**
+
+- **life_expectancy** – target variable  
+- **gdp_per_capita** – economic development  
+- **co2_per_capita** – environmental pressure  
+- **year** – time trend
+
+**What this shows**
+
+- **Life expectancy** is moderately correlated with both **GDP per capita** and **CO₂ per capita**, reflecting the patterns seen in the scatterplots.
+- **GDP per capita** and **CO₂ per capita** are themselves **strongly correlated**, which means the models have to disentangle two highly related predictors.
+- **Year** has a weaker but positive correlation with life expectancy, capturing the **overall upward trend** over time.
+
+These correlations support the modeling choice: all three predictors are informative, but also interrelated.
+
+---
+
+## 5. Life Expectancy in the Top 5 GDP Economies
+
+Finally, we examine life-expectancy trajectories for five countries with the **highest GDP** in the most recent year:
+**United States, China, India, Japan, and Germany**.
+
+```{python}
+#| title: "Life Expectancy for Countries with the Top 5 GDP"
+Image(filename=str(top5_gdp_life_png), width=1000)
+```
+
+**What this shows**
+
+- All five countries experience **long-run improvements** in life expectancy from 1990 onward.
+- **Japan** and **Germany** sit at the top of the group, maintaining the highest levels throughout the period.
+- **China** and **India** show **sharp gains**, reflecting rapid development and improvements in health infrastructure.
+- The **United States** starts comparatively high but shows **slower growth** and a recent dip
+
+---
+
+## Summary
+
+Together, these EDA plots highlight several key themes:
+
+- Life expectancy has improved **globally**, but not uniformly across countries or time.
+- Economic development (GDP per capita) is strongly associated with both **higher life expectancy** and **higher CO₂ emissions**, creating a tension between health and environmental sustainability.
+- The predictors used in the regression models—**GDP per capita**, **CO₂ per capita**, and **year**—each capture distinct but related aspects of this story, which is reflected in both the scatterplots and the correlation matrix.
