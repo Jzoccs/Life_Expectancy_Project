@@ -16,7 +16,7 @@ website:
       - href: data.qmd
         text: "Data"
       - href: automl_life_expectancy.qmd
-        text: AutoML Explorer
+        text: "AutoML Explorer"
 
 format:
   html:
