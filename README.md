@@ -1,6 +1,6 @@
 # Life_Expectancy_Project
 
-This project builds and compares several regression models attempting to predict life expectancy based on the variables of GDP per capita, CO2 emissions per capita, and year. It includes data preprocessing, model training, evaluation, and visualization of results through a Quarto website.
+This project builds and compares several regression models attempting to predict life expectancy based on the variables of GDP per capita, CO2 emissions per capita, and year. It includes data preprocessing, exploratory data analysis, model training, evaluation, and visualization of results through a Quarto website.
 
 ## Data Collection
 The life expectancy data was acquired from the World Bank API, which contains life expectancy data for various countries over several years. The GDP per capita data was also sourced from the World Bank API, providing economic context for each country. The CO2 emissions per capita data was obtained from the Global Carbon Project, agithub repository, which tracks carbon emissions globally.
@@ -8,9 +8,10 @@ The life expectancy data was acquired from the World Bank API, which contains li
 ### Project Overview
 The goals of this project are:
 1. To preprocess, clean, and merge the 3 datasets we found.
-2. Train a flaml machine learning algorithm to select the best model to predict life expectancy. Based on the year, GDP per capita, and CO2 emissions per capita.
-3. Evaluate and compare the performance of these models using RMSE, MAE and R^2.
-4. Visualize the results and findings in a Quarto website.
+2. To perform exploratory data analysis to find underlying trends in the data
+3. Train multiple machine learning algorithms using flaml to select the best model to predict life expectancy. Based on the year, GDP per capita, and CO2 emissions per capita.
+4. Evaluate and compare the performance of these models using RMSE, MAE and R^2.
+5. Visualize the results and findings in a Quarto website.
 
 ## Getting Started
 
@@ -25,7 +26,9 @@ The goals of this project are:
 Life_Expectancy_Project/
 ├── data/
 │   ├── raw/
+│   ├── external/
 │   └── processed/
+├── notebooks/
 ├── src/
 │   ├── models/
 │   ├── data/
@@ -48,12 +51,12 @@ Life_Expectancy_Project/
 
 ### Executing program
 
-* How to run the program
-* Step-by-step bullets
-
-## Help
-
-Any advise for common problems or issues.
+1. Pull the external co2 dataset from https://github.com/owid/co2-data
+2. run the files in /src/data/ in order to pull the csv's from the API's and merge datasets
+3. run the /notebooks/data_cleaning_and_exploration.ipynb file to clean the data
+4. run the /notebooks/visualizations.ipynb to perform EDA and make visuals
+5. run the /src/models/train_life_expectancy_model.py to train all four models
+6. run the /notebooks/Regression_visualizations.ipynb to get the regression visualizations 
 
 ## Authors
 
