@@ -39,10 +39,11 @@ Life_Expectancy_Project/
 │   ├── analysis.qmd
 │   ├── data.qmd
 │   ├── visualizations.qmd
-│   └── automl.qmd
+│   ├── automl_life_expectancy.qmd
+│   └── _quarto.yml
 ├── requirements.txt
 ├── README.md
-└── _quarto.yml
+└── .gitignore
 
 ### Installing
 
